@@ -1,6 +1,5 @@
 package Traffic;
 import java.awt.Color;
-import ai.djl.*;
 
 public class Car {
 
