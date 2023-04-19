@@ -29,15 +29,15 @@ public class App extends Application {
         scene.setRoot(loadFXML(fxml));
     }
 
-    static void MysetText() throws IOException {
-        Parent loaded = loadFXML("primary.fxml");
-        Label myLabel = (Label) loaded.lookup("#myLabel");
-        TextField myTextField = (TextField) loaded.lookup("#myTextField");
-        String testText = myTextField.getText();
-        myLabel.setText(testText);
-        System.out.println(testText);
-        System.out.println(myLabel.getText());
-    }
+    // static void MysetText() throws IOException {
+    //     Parent loaded = loadFXML("primary.fxml");
+    //     Label myLabel = (Label) loaded.lookup("#myLabel");
+    //     TextField myTextField = (TextField) loaded.lookup("#myTextField");
+    //     String testText = myTextField.getText();
+    //     myLabel.setText(testText);
+    //     System.out.println(testText);
+    //     System.out.println(myLabel.getText());
+    // }
 
     private static Parent loadFXML(String fxml) throws IOException {
         FXMLLoader fxmlLoader = new FXMLLoader(App.class.getResource(fxml + ".fxml"));
