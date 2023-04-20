@@ -1,41 +1,48 @@
-import java.util.Scanner;
-
 public class Matrix {
 
-  // 0:x, 1:y, 2:z etc.
   private int[] shape;
-  private float[] matrix;
+  private float[][] matrix;
 
   public Matrix(int[] shape) {
     this.shape = shape;
-    this.matrix = new float[shape[0] * shape[1] * shape[2]];
+    this.matrix = new float[shape[0]][shape[1]];
+  }
+
+  public Matrix(int row, int col) {
+    this.shape = new int[] { row, col };
+    this.matrix = new float[row][col];
+  }
+
+  public Matrix(int[] shape, float[][] matrix) {
+    this.shape = shape;
+    this.matrix = matrix;
   }
 
   public float get_item(int[] index) {
     int i = index[0];
     int j = index[1];
-    int k = index[2];
-    int index_ = k * shape[0] * shape[1] + i * shape[1] + j;
-    return matrix[index_];
+    return matrix[i][j];
   }
 
   public float get_item(int index) {
-    return matrix[index];
+    int row = index / shape[1];
+    int col = index % shape[1];
+    return matrix[row][col];
   }
 
   public void set_item(int[] index, float value) {
     int i = index[0];
     int j = index[1];
-    int k = index[2];
-    int index_ = k * shape[0] * shape[1] + i * shape[1] + j;
-    matrix[index_] = value;
+    matrix[i][j] = value;
   }
 
   public void set_item(int index, float value) {
-    matrix[index] = value;
+    int row = index / shape[1];
+    int col = index % shape[1];
+    matrix[row][col] = value;
   }
 
-  public float[] get_matrix() {
+  public float[][] get_matrix() {
     return matrix;
   }
 
@@ -47,22 +54,8 @@ public class Matrix {
     return shape;
   }
 
-  public void defineMatrix() {
-    System.out.println("Enter matrix:");
-    Scanner input = new Scanner(System.in);
-    for (int k = 0; k < shape[2]; k++) {
-      for (int i = 0; i < shape[0]; i++) {
-        for (int j = 0; j < shape[1]; j++) {
-          int index = k * shape[0] * shape[1] + i * shape[1] + j;
-          matrix[index] = input.nextFloat();
-        }
-        System.out.println();
-      }
-      System.out.println();
-    }
-    input.close();
-    System.out.println("Matrix defined");
-
+  public void defineMatric(float[][] matrix) {
+    this.matrix = matrix;
   }
 
   public void fill(float value) {
@@ -72,13 +65,10 @@ public class Matrix {
   }
 
   public void showMatrix() {
-    for (int k = 0; k < shape[2]; k++) {
-      for (int i = 0; i < shape[0]; i++) {
-        for (int j = 0; j < shape[1]; j++) {
-          int index = k * shape[0] * shape[1] + i * shape[1] + j;
-          System.out.print(matrix[index] + " ");
-        }
-        System.out.println();
+    for (int i = 0; i < shape[0]; i++) {
+      for (int j = 0; j < shape[1]; j++) {
+        int index = i * shape[1] + j;
+        System.out.print(matrix[index] + " ");
       }
       System.out.println();
     }
@@ -114,49 +104,57 @@ public class Matrix {
     return null;
   }
 
+  public static Matrix scalar_multiple(float scalar, Matrix a) {
+    Matrix result = new Matrix(a.get_shape());
+    for (int i = 0; i < result.length(); i++) {
+      result.set_item(i, scalar * a.get_item(i));
+    }
+    return result;
+  }
+
   public static Matrix matrix_multiply(Matrix a, Matrix b) {
     int[] a_shape = a.get_shape();
     int[] b_shape = b.get_shape();
-    if (compare_shape(b, b)) {
-      int[] c_shape = { a_shape[0], b_shape[1], a_shape[2] };
-      Matrix result = new Matrix(c_shape);
-      for (int k = 0; k < c_shape[2]; k++) {
-        for (int i = 0; i < c_shape[0]; i++) {
-          for (int j = 0; j < c_shape[1]; j++) {
-            float sum = 0;
-            for (int l = 0; l < a_shape[1]; l++) {
-              sum += a.get_item(new int[] { i, l, k }) * b.get_item(new int[] { l, j, k });
+    if (a_shape[1] != b_shape[0]) {
+      System.out.println("Matrices cannot be multiplied");
+      return null;
+    }
+    int[] c_shape = { a_shape[0], b_shape[1] };
+    Matrix result = new Matrix(c_shape);
+    for (int i = 0; i < c_shape[0]; i++) {
+      for (int j = 0; j < c_shape[1]; j++) {
+        float sum = 0;
+        for (int k = 0; k < a_shape[1]; k++) {
+          sum += a.get_item(new int[] { i, k }) * b.get_item(new int[] { k, j });
+        }
+        result.set_item(new int[] { i, j }, sum);
+      }
+    }
+    return result;
+  }
+
+  public static float determinant(float[][] matrix2D) {
+    int n = matrix2D.length;
+    if (n == 1) {
+        return matrix2D[0][0];
+    } else if (n == 2) {
+        return matrix2D[0][0] * matrix2D[1][1] - matrix2D[0][1] * matrix2D[1][0];
+    } else {
+        float det = 0;
+        for (int j = 0; j < n; j++) {
+            float[][] submatrix = new float[n-1][n-1];
+            for (int i = 1; i < n; i++) {
+                for (int k = 0; k < n; k++) {
+                    if (k < j) {
+                        submatrix[i-1][k] = matrix2D[i][k];
+                    } else if (k > j) {
+                        submatrix[i-1][k-1] = matrix2D[i][k];
+                    }
+                }
             }
-            result.set_item(new int[] { i, j, k }, sum);
-          }
+            det += Math.pow(-1, j) * matrix2D[0][j] * determinant(submatrix);
         }
-      }
-      return result;
+        return det;
     }
-    return null;
   }
-
-  public static Matrix scalar_multiple(float a, Matrix matrix) {
-    Matrix result = new Matrix(matrix.get_shape());
-    for (int i = 0; i < result.length(); i++) {
-      result.set_item(i, a * matrix.get_item(i));
-    }
-    return result;
-  }
-
-  public static Matrix transposition(Matrix a) {
-    int[] a_shape = a.get_shape();
-    int[] b_shape = { a_shape[1], a_shape[0], a_shape[2] };
-    Matrix result = new Matrix(b_shape);
-    for (int k = 0; k < a_shape[2]; k++) {
-      for (int i = 0; i < a_shape[0]; i++) {
-        for (int j = 0; j < a_shape[1]; j++) {
-          int[] position = { j, i, k };
-          float value = a.get_item(new int[] { i, j, k });
-          result.set_item(position, value);
-        }
-      }
-    }
-    return result;
-  }
-}
+} 
