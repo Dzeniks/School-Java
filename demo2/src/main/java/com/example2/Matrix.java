@@ -1,3 +1,5 @@
+package com.example2;
+
 public class Matrix {
 
   private int[] shape;
@@ -16,6 +18,10 @@ public class Matrix {
   public Matrix(int[] shape, float[][] matrix) {
     this.shape = shape;
     this.matrix = matrix;
+  }
+
+  public float get_item(int row, int col) {
+    return matrix[row][col];
   }
 
   public float get_item(int[] index) {
@@ -78,7 +84,7 @@ public class Matrix {
 
 
   public static boolean compare_shape(Matrix a, Matrix b) {
-    if (a.get_shape() != b.get_shape()) {
+    if (a.get_shape()[0] !=  b.get_shape()[0] || a.get_shape()[1] != b.get_shape()[1]) {
       System.out.println("Matrices must have the same shape");
       return false;
     }
@@ -87,8 +93,9 @@ public class Matrix {
 
   public static Matrix sum(Matrix a, Matrix b) {
     if (compare_shape(a, b)) {
-      Matrix matrix = new Matrix(a.get_shape());
-      for (int i = 0; i < matrix.length(); i++) {
+      int[] shape = a.get_shape();
+      Matrix matrix = new Matrix(shape);
+      for (int i = 0; i < (shape[0]*shape[1]); i++) {
         matrix.set_item(i, a.get_item(i) + b.get_item(i));
       }
       return matrix;
